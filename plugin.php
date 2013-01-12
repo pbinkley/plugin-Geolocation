@@ -36,13 +36,22 @@ function geolocation_install()
     $sql = "
     CREATE TABLE IF NOT EXISTS $db->Location (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-    `item_id` BIGINT UNSIGNED NOT NULL ,
     `latitude` DOUBLE NOT NULL ,
     `longitude` DOUBLE NOT NULL ,
     `zoom_level` INT NOT NULL ,
     `map_type` VARCHAR( 255 ) NOT NULL ,
     `address` TEXT NOT NULL ,
-    INDEX (`item_id`)) ENGINE = MYISAM";
+    `address_hash` VARCHAR( 40 ) NOT NULL ,
+    UNIQUE (`address_hash`)) ENGINE = MYISAM";
+    $db->query($sql);
+    
+    $sql = "
+    CREATE TABLE IF NOT EXISTS $db->Location_To_Item (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `item_id` BIGINT UNSIGNED NOT NULL ,
+    `location_id` BIGINT UNSIGNED NOT NULL ,
+    INDEX (`item_id`),
+    INDEX (`location_id`)) ENGINE = MYISAM";
     $db->query($sql);
     
     // If necessary, upgrade the plugin options
@@ -70,6 +79,7 @@ function geolocation_uninstall()
     // Drop the Location table
 	$db = get_db();
 	$db->query("DROP TABLE $db->Location");
+	$db->query("DROP TABLE $db->Location_To_Item");
 }
 
 function geolocation_config_form()
@@ -604,7 +614,8 @@ function geolocation_item_browse_sql($select, $params)
 
         if ($request->get('only_map_items') || $address != '') {
             //INNER JOIN the locations table
-            $select->joinInner(array('l' => $db->Location), 'l.item_id = i.id', 
+            $select->joinInner(array('li' => $db->Location_To_Item), 'l.location_id = li.location_id'); 
+            $select->joinInner(array('l' => $db->Location), 'li.item_id = i.id', 
                 array('latitude', 'longitude', 'address'));
         }
         

@@ -18,7 +18,9 @@ class LocationTable extends Omeka_Db_Table
         }
         
         // Create a SELECT statement for the Location table
+        // make this an inner join between Location and LocationToItem
         $select = $db->select()->from(array('l' => $db->Location), 'l.*');
+        $select->joinLeft(array('li' => $db->Location_To_Item), 'li.location_id = l.id');
         
         // Create a WHERE condition that will pull down all the location info
         if (is_array($item)) {
@@ -26,10 +28,10 @@ class LocationTable extends Omeka_Db_Table
             foreach ($item as $it) {
                 $itemIds[] = (int)(($it instanceof Item) ? $it->id : $it);
             }
-            $select->where('l.item_id IN (?)', $itemIds);
+            $select->where('li.item_id IN (?)', $itemIds);
         } else {
             $itemId = (int)(($item instanceof Item) ? $item->id : $item);
-            $select->where('l.item_id = ?', $itemId);
+            $select->where('li.item_id = ?', $itemId);
         }
         
         // Get the locations
