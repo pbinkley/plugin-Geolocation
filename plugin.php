@@ -181,7 +181,7 @@ function geolocation_save_location($item)
         return;
     }
         
-    // Find the location object for the item
+    // Retrieve the location object for the item
     $location = geolocation_get_location_for_item($item, true);
     
     // If we have filled out info for the geolocation, then submit to the db
@@ -189,10 +189,13 @@ function geolocation_save_location($item)
     if (!empty($geolocationPost) && 
         (((string)$geolocationPost['latitude']) != '') && 
         (((string)$geolocationPost['longitude']) != '')) {
-        if (!$location) {
-            $location = new Location;
-            $location->item_id = $item->id;
-        }
+        // we have a submitted geolocation
+            if (!$location) {
+               // replace old location, if one was retrieved 
+               $location = new Location;
+               $location->item_id = $item->id;
+            }
+        // save location, whether new or old
         $location->saveForm($geolocationPost);
     // If the form is empty, then we want to delete whatever location is 
     // currently stored
