@@ -76,12 +76,18 @@ class Location extends Omeka_Record
         it already exists; then insert the item_id into Location_To_Item
         
         array:
-         geolocation[latitude] = 52.519171
-         geolocation[longitude] = 13.406091199999992
-         geolocation[zoom_level] = 5
-         geolocation[map_type] = Google Maps v3.x
-         geolocation[address] = Berlin, Germany
+            item_id: 120
+            latitude: 52.519171
+            longitude: 13.406091199999992
+            zoom_level: 5
+            map_type: Google Maps v3.x
+            address: Berlin, Germany
+            id: 
         */
+        
+        debug("data_to_save:");
+        foreach ($data_to_save as $key => $value)
+            debug($key . ": " . $value);
         
          // add address_hash
          $data_to_save['address_hash'] = sha1($data_to_save['address']);
@@ -92,18 +98,25 @@ class Location extends Omeka_Record
          
          // insert Location
 
-         $insert_id = $this->getDb()->insert(get_class($this), $data_to_save);
-         
-         // insert Location_To_Item
-        
-        
-        
-        
-        
-        if ($was_inserted && (empty($insert_id) || !is_numeric($insert_id))) {
+         $location_id = $this->getDb()->insert(get_class($this), $data_to_save);
+         debug("location_id: " . $location_id);
+
+        if ($was_inserted && (empty($location_id) || !is_numeric($location_id))) {
             throw new Omeka_Record_Exception("LAST_INSERT_ID() did not return a numeric ID when saving the record.");
         }
-        $this->id = $insert_id;
+        $this->id = $location_id;
+         
+         // insert Location_To_Item
+         $location_to_item = Array("item_id" => $item_id, "location_id" => $location_id);
+         $location_to_item_id = $this->getDb()->insert("Location_To_Item" , $location_to_item);
+         debug("location_to_item_id: " . $location_to_item_id);
+        
+        if ($was_inserted && (empty($location_to_item_id) || !is_numeric($location_to_item_id))) {
+            throw new Omeka_Record_Exception("LAST_INSERT_ID() did not return a numeric ID when saving the record.");
+        }
+        
+        
+        
         
         if ($was_inserted) {
             // Run the local afterInsert hook, the modules afterInsert hook, then

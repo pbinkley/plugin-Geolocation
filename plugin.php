@@ -617,8 +617,8 @@ function geolocation_item_browse_sql($select, $params)
 
         if ($request->get('only_map_items') || $address != '') {
             //INNER JOIN the locations table
-            $select->joinInner(array('li' => $db->Location_To_Item), 'l.location_id = li.location_id'); 
-            $select->joinInner(array('l' => $db->Location), 'li.item_id = i.id', 
+            $select->joinInner(array('li' => $db->Location_To_Item), 'i.id = li.item_id'); 
+            $select->joinInner(array('l' => $db->Location), 'li.location_id = l.id', 
                 array('latitude', 'longitude', 'address'));
         }
         
