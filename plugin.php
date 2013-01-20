@@ -45,9 +45,12 @@ function geolocation_install()
     UNIQUE (`address_hash`)) ENGINE = MYISAM";
     $db->query($sql);
     
+    
+    // note: we have to name the id field something other than id to prevent it being
+    // returned in inner join queries, overriding the value of the item id
     $sql = "
     CREATE TABLE IF NOT EXISTS $db->Location_To_Item (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `li_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `item_id` BIGINT UNSIGNED NOT NULL ,
     `location_id` BIGINT UNSIGNED NOT NULL ,
     INDEX (`item_id`),
