@@ -14,11 +14,15 @@
                 ]]></text>
             </BalloonStyle>
         </Style>
+        <!-- <?php echo var_dump($locations); ?> -->
         <?php
-        while(loop_items()):
+/*        while(loop_items()):
         $item = get_current_item();
-        $location = $locations[$item->id];
-        ?>
+        $location = $locations[$item->id]; */
+        foreach($locations as $location) {
+        /*
+         this is the item-based version 
+         ?>
         <Placemark>
             <name><![CDATA[<?php echo item('Dublin Core', 'Title');?>]]></name>
             <namewithlink><![CDATA[<?php echo link_to_item(item('Dublin Core', 'Title'), array('class' => 'view-item')); ?>]]></namewithlink>
@@ -40,6 +44,24 @@
             <address><![CDATA[<?php echo $location['address']; ?>]]></address>
             <?php endif; ?>
         </Placemark>
-        <?php endwhile; ?>
+        
+        <?php */ 
+        //and this is the new location-based version ?>
+        <Placemark>
+            <name><![CDATA[<?php echo $location['address'];?>]]></name>
+            <namewithlink><![CDATA[<a href="http://www.wallandbinkley.com/rcb/omeka-dev/items/browse?search=&geolocation-address=<?php echo urlencode($location['address']);?>"><?php echo $location['address'];?></a>]]></namewithlink>
+            <Snippet maxLines="2">Item count here.</Snippet>    
+            <description></description>
+            <Point>
+                <coordinates><?php echo $location['longitude']; ?>,<?php echo $location['latitude']; ?></coordinates>
+            </Point>
+            <?php if ($location['address']): ?>
+            <address><![CDATA[<?php echo $location['address']; ?>]]></address>
+            <?php endif; ?>
+        </Placemark>
+         
+        <?php
+        //endwhile;
+        } ?>
     </Document>
 </kml>
